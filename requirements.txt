@@ -1,6 +1,6 @@
 Flask
 flask-cors
-tensorflow
+tensorflow==2.21.0
 numpy
 Pillow
 Werkzeug
