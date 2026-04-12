@@ -33,7 +33,7 @@ def load_model_safe(path):
             print(f"❌ File not found: {path}")
             return None
 
-        model = tf.keras.models.load_model(path, compile=False, safe_mode=False)
+        model = tf.keras.models.load_model(path, compile=False )
         print(f"✅ Loaded: {path}")
         return model
 
