@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import uuid
+import gc
 
 from utils.Xrayprocessing import preprocess_image
 from utils.Pridicted import predict_model
@@ -46,33 +47,46 @@ print("📦 Loading models...")
 
 MODELS = {
     "brain": {
-        "model": load_model_safe("Models/mri_brain_model_final.keras"),
+        "path": "Models/mri_brain_model_final.keras",
+        "model": None,
         "classes": ["Alzehaimer", "Glioma-Tumor ", "Meningioma-Tumor", "Multiple Sclerosis ", "Normal", "Pituitary-Tumor"],
         "img_size": (300, 300)
     },
     "chest": {
-        "model": load_model_safe("Models/chest_ct_cancer_model.keras"),
+        "path": "Models/chest_ct_cancer_model.keras",
+        "model": None,
         "classes": ["adenocarcinoma_left.lower.lobe_T2_N0_M0_Ib ", "normal", "squamous.cell.carcinoma_left.hilum_T1_N2_M0_IIIa "],
         "img_size": (256, 256)
     },
     "kidney": {
-        "model": load_model_safe("Models/final_model_25.keras"),
-        "classes": ["Non-Stone" , "Stone"],
+        "path": "Models/final_model_25.keras",
+        "model": None,
+        "classes": ["Non-Stone", "Stone"],
         "img_size": (300, 300)
     },
     "bone": {
-        "model": load_model_safe("Models/bone_2_fracture_model.keras"),
+        "path": "Models/bone_2_fracture_model.keras",
+        "model": None,
         "classes": ["Fractured", "Not Fractured"],
         "img_size": (300, 300)
     },
     "brainStroke": {
-        "model": load_model_safe("Models/Brain_Stroke.keras"),
+        "path": "Models/Brain_Stroke.keras",
+        "model": None,
         "classes": ["Bleeding", "Ischemia", "Normal "],
         "img_size": (300, 300)
     }
 }
+def get_model(model_name):
+    model_data = MODELS[model_name]
 
-print("✅ All models loaded")
+    if model_data["model"] is None:
+        
+        model_data["model"] = load_model_safe(model_data["path"])
+
+    return model_data["model"]
+
+
 
 # ================= MEDICAL INFO =================
 MEDICAL_INFO = {
@@ -441,6 +455,7 @@ def predict(model_name):
         return jsonify({"error": "Invalid model name"}), 400
 
     model_data = MODELS[model_name]
+    model = get_model(model_name)
 
     if model_data["model"] is None:
         return jsonify({"error": "Model not loaded"}), 500
