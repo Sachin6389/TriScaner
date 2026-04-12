@@ -9,7 +9,7 @@ services:
       pip install --no-cache-dir -r requirements.txt
 
     startCommand: |
-      gunicorn app:app --workers 1 --threads 2 --timeout 400
+      gunicorn app:app --workers 1 --threads 2 --timeout 300
 
     envVars:
       - key: PYTHON_VERSION
@@ -17,6 +17,9 @@ services:
 
       - key: TF_CPP_MIN_LOG_LEVEL
         value: "2"
+
+      - key: TF_ENABLE_ONEDNN_OPTS
+        value: "0"
 
       - key: KERAS_BACKEND
         value: "tensorflow"
