@@ -6,10 +6,10 @@ services:
 
     buildCommand: |
       pip install --upgrade pip
-      pip install --no-cache-dir -r requirements.txt
+      pip install -r requirements.txt
 
     startCommand: |
-      gunicorn app:app --workers 1 --threads 2 --timeout 300
+      gunicorn app:app --workers 1 --threads 2 --timeout 120
 
     envVars:
       - key: PYTHON_VERSION
@@ -18,10 +18,5 @@ services:
       - key: TF_CPP_MIN_LOG_LEVEL
         value: "2"
 
-      - key: TF_ENABLE_ONEDNN_OPTS
-        value: "0"
-
-      - key: KERAS_BACKEND
-        value: "tensorflow"
-
-    autoDeploy: true
+      - key: PYTHONUNBUFFERED
+        value: "true"
