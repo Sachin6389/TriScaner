@@ -77,14 +77,27 @@ MODELS = {
         "img_size": (300, 300)
     }
 }
+CURRENT_MODEL = {"name": None, "model": None}
+
 def get_model(model_name):
+    global CURRENT_MODEL
+
+    # If same model → reuse
+    if CURRENT_MODEL["name"] == model_name:
+        return CURRENT_MODEL["model"]
+
+    # Free old model
+    if CURRENT_MODEL["model"] is not None:
+        del CURRENT_MODEL["model"]
+        gc.collect()
+
     model_data = MODELS[model_name]
+    model = load_model_safe(model_data["path"])
 
-    if model_data["model"] is None:
-        
-        model_data["model"] = load_model_safe(model_data["path"])
+    CURRENT_MODEL["name"] = model_name
+    CURRENT_MODEL["model"] = model
 
-    return model_data["model"]
+    return model
 
 
 
