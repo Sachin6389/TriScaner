@@ -2,11 +2,13 @@ import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 import tensorflow as tf
+import gdown
+import gc
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import uuid
-import gc
 
 from utils.Xrayprocessing import preprocess_image
 from utils.Pridicted import predict_model
@@ -21,28 +23,13 @@ app = Flask(__name__)
 CORS(app)
 
 print("🚀 Starting Medical AI API...")
-
-# ================= HELPERS =================
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def load_model_safe(path):
-    try:
-        if not os.path.exists(path):
-            print(f"❌ File not found: {path}")
-            return None
-
-        model = tf.keras.models.load_model(path, compile=False )
-        print(f"✅ Loaded: {path}")
-        return model
-
-    except Exception as e:
-        print(f"❌ Error loading {path}: {e}")
-        return None
-
-
-# ================= LOAD MODELS =================
+MODEL_URLS = {
+    "brain": "https://drive.google.com/uc?id=1ELkXBBUTFc5z19O5Or73Ji8Fazrt3Upc",
+    "chest": "https://drive.google.com/uc?id=11Oxcx2Ta2YMVKSWxeyD4GaXpc8Q683CL",
+    "kidney": "https://drive.google.com/uc?id=1z3H7E_f9hGZ5A0-6LkU87H25HA6I_eFn",
+    "bone": "https://drive.google.com/uc?id=1psqt1_MQxb7QYBXZX3EroPvGjV-jDnXP",
+    "brainStroke": "https://drive.google.com/uc?id=1spKUf6tzPRS9Pr-64KSt1cCv4-lrD-lh"
+}
 print("📦 Loading models...")
 
 MODELS = {
@@ -77,22 +64,40 @@ MODELS = {
         "img_size": (300, 300)
     }
 }
+
 CURRENT_MODEL = {"name": None, "model": None}
+
+# ================= HELPERS =================
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def get_model(model_name):
     global CURRENT_MODEL
 
-    # If same model → reuse
+    model_data = MODELS[model_name]
+    model_path = model_data["path"]
+
+    # Download if not exists
+    if not os.path.exists(model_path):
+        print(f"⬇️ Downloading {model_name} model...")
+        url = MODEL_URLS[model_name]
+        gdown.download(url, model_path, quiet=False)
+
+    # Use cached model
     if CURRENT_MODEL["name"] == model_name:
+        print(f"⚡ Using cached model: {model_name}")
         return CURRENT_MODEL["model"]
 
-    # Free old model
+    # Remove previous model from RAM
     if CURRENT_MODEL["model"] is not None:
+        print(f"🧹 Clearing RAM model: {CURRENT_MODEL['name']}")
         del CURRENT_MODEL["model"]
         gc.collect()
 
-    model_data = MODELS[model_name]
-    model = load_model_safe(model_data["path"])
+    # Load model
+    print(f"📦 Loading model into RAM: {model_name}")
+    model = tf.keras.models.load_model(model_path, compile=False)
 
     CURRENT_MODEL["name"] = model_name
     CURRENT_MODEL["model"] = model
@@ -467,11 +472,11 @@ def predict(model_name):
     if model_name not in MODELS:
         return jsonify({"error": "Invalid model name"}), 400
 
-    model_data = MODELS[model_name]
     model = get_model(model_name)
+    model_data = MODELS[model_name]
+    
 
-    if model_data["model"] is None:
-        return jsonify({"error": "Model not loaded"}), 500
+    
 
     if "image" not in request.files:
         return jsonify({"error": "No image uploaded"}), 400
@@ -496,7 +501,7 @@ def predict(model_name):
             return jsonify({"error": "Image processing failed"}), 400
 
         result = predict_model(
-            model=model_data["model"],
+            model=model,
             image=img,
             class_names=model_data["classes"]
         )
