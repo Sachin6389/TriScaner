@@ -5,18 +5,15 @@ services:
     plan: free
 
     buildCommand: |
+      apt-get update && apt-get install -y git-lfs
+      git lfs install
+      git lfs pull
       pip install --upgrade pip
       pip install -r requirements.txt
 
     startCommand: |
-      gunicorn app:app --workers 1 --threads 2 --timeout 180
+      gunicorn app:app --workers 1 --threads 2 --timeout 120
 
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.13
-
-      - key: TF_CPP_MIN_LOG_LEVEL
-        value: "2"
-
-      - key: PYTHONUNBUFFERED
-        value: "true"
+        value: 3.10
