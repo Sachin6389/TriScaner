@@ -4,6 +4,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 import tensorflow as tf
 import gdown
 import gc
+import logging
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -12,6 +13,8 @@ import uuid
 
 from utils.Xrayprocessing import preprocess_image
 from utils.Pridicted import predict_model
+
+logging.basicConfig(level=logging.INFO)
 
 # ================= CONFIG =================
 UPLOAD_FOLDER = "uploads"
@@ -547,4 +550,5 @@ def health():
 
 # ================= RUN =================
 if __name__ == "__main__":
-    app.run(debug=True, use_reloader=False, host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
