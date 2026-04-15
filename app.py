@@ -93,23 +93,23 @@ def get_model(model_name):
         gdown.download(url, model_path, quiet=False)
 
     if CURRENT_MODEL["name"] == model_name:
-        print(f"⚡ Using cached model: {model_name}")
         return CURRENT_MODEL["model"]
 
     if CURRENT_MODEL["model"] is not None:
-        print(f"🧹 Clearing RAM model: {CURRENT_MODEL['name']}")
         del CURRENT_MODEL["model"]
         gc.collect()
 
-    print(f"📦 Loading model into RAM: {model_name}")
+    print(f"📦 Loading model: {model_name}")
 
-    # 🔥 FIX HERE (critical change)
-    with keras.utils.custom_object_scope({}):
-        model = tf.keras.models.load_model(
-            model_path,
-            compile=False,
-            safe_mode=False
-        )
+    # 🔥 HARD FIX (bypass broken config)
+    model = tf.keras.models.load_model(
+        model_path,
+        compile=False,
+        safe_mode=False,
+        custom_objects={
+            "Dense": tf.keras.layers.Dense
+        }
+    )
 
     CURRENT_MODEL["name"] = model_name
     CURRENT_MODEL["model"] = model
