@@ -86,7 +86,7 @@ def get_model(model_name):
     if not os.path.exists(model_path):
         print(f"⬇️ Downloading {model_name} model...")
         url = MODEL_URLS[model_name]
-        gdown.download(url, model_path, quiet=False,   fuzzy=True)
+        gdown.download(url, model_path, quiet=False)
 
     # Use cached model
     if CURRENT_MODEL["name"] == model_name:
