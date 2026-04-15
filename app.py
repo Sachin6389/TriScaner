@@ -76,6 +76,7 @@ def allowed_file(filename):
 
 
 def get_model(model_name):
+    os.makedirs("Models", exist_ok=True)
     global CURRENT_MODEL
 
     model_data = MODELS[model_name]
