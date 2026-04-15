@@ -21,6 +21,9 @@ logging.basicConfig(level=logging.INFO)
 UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+import keras
+
+keras.config.enable_unsafe_deserialization()
 
 # ================= INIT =================
 app = Flask(__name__)

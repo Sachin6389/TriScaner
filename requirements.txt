@@ -1,7 +1,9 @@
 tensorflow==2.16.1
+keras==3.3.3
 flask
 flask-cors
 numpy
 pillow
 gunicorn
 gdown
+h5py==3.11.0
