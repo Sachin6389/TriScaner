@@ -37,31 +37,31 @@ print("📦 Loading models...")
 
 MODELS = {
     "brain": {
-        "path": "Models/mri_brain_model_final.keras",
+        "path": "Models/mri_brain_model_final.h5",
         "model": None,
         "classes": ["Alzehaimer", "Glioma-Tumor", "Meningioma-Tumor", "Multiple Sclerosis", "Normal", "Pituitary-Tumor"],
         "img_size": (300, 300)
     },
     "chest": {
-        "path": "Models/chest_ct_cancer_model.keras",
+        "path": "Models/chest_ct_cancer_model.h5",
         "model": None,
         "classes": ["adenocarcinoma_left.lower.lobe_T2_N0_M0_Ib ", "normal", "squamous.cell.carcinoma_left.hilum_T1_N2_M0_IIIa "],
         "img_size": (256, 256)
     },
     "kidney": {
-        "path": "Models/final_model_25.keras",
+        "path": "Models/final_model_25.h5",
         "model": None,
         "classes": ["Non-Stone", "Stone"],
         "img_size": (300, 300)
     },
     "bone": {
-        "path": "Models/bone_2_fracture_model.keras",
+        "path": "Models/bone_2_fracture_model.h5",
         "model": None,
         "classes": ["Fractured", "Not Fractured"],
         "img_size": (300, 300)
     },
     "brainStroke": {
-        "path": "Models/Brain_Stroke.keras",
+        "path": "Models/Brain_Stroke.h5",
         "model": None,
         "classes": ["Bleeding", "Ischemia", "Normal "],
         "img_size": (300, 300)
