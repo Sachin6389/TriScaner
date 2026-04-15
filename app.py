@@ -5,6 +5,7 @@ import tensorflow as tf
 import gdown
 import gc
 import logging
+import keras
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -21,9 +22,9 @@ logging.basicConfig(level=logging.INFO)
 UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-import keras
 
-keras.config.enable_unsafe_deserialization()
+
+
 
 # ================= INIT =================
 app = Flask(__name__)
