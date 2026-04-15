@@ -27,11 +27,11 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 print("🚀 Starting Medical AI API...")
 MODEL_URLS = {
-    "brain": "https://drive.google.com/uc?id=1ELkXBBUTFc5z19O5Or73Ji8Fazrt3Upc",
-    "chest": "https://drive.google.com/uc?id=11Oxcx2Ta2YMVKSWxeyD4GaXpc8Q683CL",
-    "kidney": "https://drive.google.com/uc?id=1z3H7E_f9hGZ5A0-6LkU87H25HA6I_eFn",
-    "bone": "https://drive.google.com/uc?id=1psqt1_MQxb7QYBXZX3EroPvGjV-jDnXP",
-    "brainStroke": "https://drive.google.com/uc?id=1spKUf6tzPRS9Pr-64KSt1cCv4-lrD-lh"
+    "brain": "https://drive.google.com/uc?id=1mLJ77s7glOe2OfjzdyrzOS8i94Xxi18O",
+    "chest": "https://drive.google.com/uc?id=1flUOLaktjFumRIqg_p-w44anIo9frrmW",
+    "kidney": "https://drive.google.com/uc?id=1zA-LpqHIkRj2pMcS8P0hf1RLkgW04udg",
+    "bone": "https://drive.google.com/uc?id=1bQkaRVM5VachR4U62kIds6v1XKkN-t9l",
+    "brainStroke": "https://drive.google.com/uc?id=17jApCYTKVK7LFeVpap6yY8CFOUYNkgeX"
 }
 print("📦 Loading models...")
 
