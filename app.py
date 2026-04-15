@@ -86,7 +86,7 @@ def get_model(model_name):
     if not os.path.exists(model_path):
         print(f"⬇️ Downloading {model_name} model...")
         url = MODEL_URLS[model_name]
-        gdown.download(url, model_path, quiet=False)
+        gdown.download(url, model_path, quiet=False,   fuzzy=True)
 
     # Use cached model
     if CURRENT_MODEL["name"] == model_name:
@@ -101,8 +101,8 @@ def get_model(model_name):
 
     # Load model
     print(f"📦 Loading model into RAM: {model_name}")
-    model = tf.keras.models.load_model(model_path, compile=False , safe_mode=False
- )
+    model = tf.keras.models.load_model(model_path, compile=False )
+ 
 
     CURRENT_MODEL["name"] = model_name
     CURRENT_MODEL["model"] = model
