@@ -39,7 +39,7 @@ MODELS = {
     "brain": {
         "path": "Models/mri_brain_model_final.keras",
         "model": None,
-        "classes": ["Alzehaimer", "Glioma-Tumor ", "Meningioma-Tumor", "Multiple Sclerosis ", "Normal", "Pituitary-Tumor"],
+        "classes": ["Alzehaimer", "Glioma-Tumor", "Meningioma-Tumor", "Multiple Sclerosis", "Normal", "Pituitary-Tumor"],
         "img_size": (300, 300)
     },
     "chest": {
@@ -101,7 +101,8 @@ def get_model(model_name):
 
     # Load model
     print(f"📦 Loading model into RAM: {model_name}")
-    model = tf.keras.models.load_model(model_path, compile=False )
+    model = tf.keras.models.load_model(model_path, compile=False , safe_mode=False
+ )
 
     CURRENT_MODEL["name"] = model_name
     CURRENT_MODEL["model"] = model
