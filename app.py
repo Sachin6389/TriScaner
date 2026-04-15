@@ -31,41 +31,41 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 print("🚀 Starting Medical AI API...")
 MODEL_URLS = {
-    "brain": "https://drive.google.com/uc?id=1mLJ77s7glOe2OfjzdyrzOS8i94Xxi18O",
-    "chest": "https://drive.google.com/uc?id=1flUOLaktjFumRIqg_p-w44anIo9frrmW",
-    "kidney": "https://drive.google.com/uc?id=1zA-LpqHIkRj2pMcS8P0hf1RLkgW04udg",
-    "bone": "https://drive.google.com/uc?id=1bQkaRVM5VachR4U62kIds6v1XKkN-t9l",
-    "brainStroke": "https://drive.google.com/uc?id=17jApCYTKVK7LFeVpap6yY8CFOUYNkgeX"
+    "brain": "https://drive.google.com/uc?id=1ELkXBBUTFc5z19O5Or73Ji8Fazrt3Upc",
+    "chest": "https://drive.google.com/uc?id=11Oxcx2Ta2YMVKSWxeyD4GaXpc8Q683CL",
+    "kidney": "https://drive.google.com/uc?id=1z3H7E_f9hGZ5A0-6LkU87H25HA6I_eFn",
+    "bone": "https://drive.google.com/uc?id=1psqt1_MQxb7QYBXZX3EroPvGjV-jDnXP",
+    "brainStroke": "https://drive.google.com/uc?id=1spKUf6tzPRS9Pr-64KSt1cCv4-lrD-lh"
 }
 print("📦 Loading models...")
 
 MODELS = {
     "brain": {
-        "path": "Models/mri_brain_model_final.h5",
+        "path": "Models/mri_brain_model_final.keras",
         "model": None,
         "classes": ["Alzehaimer", "Glioma-Tumor", "Meningioma-Tumor", "Multiple Sclerosis", "Normal", "Pituitary-Tumor"],
         "img_size": (300, 300)
     },
     "chest": {
-        "path": "Models/chest_ct_cancer_model.h5",
+        "path": "Models/chest_ct_cancer_model.keras",
         "model": None,
         "classes": ["adenocarcinoma_left.lower.lobe_T2_N0_M0_Ib ", "normal", "squamous.cell.carcinoma_left.hilum_T1_N2_M0_IIIa "],
         "img_size": (256, 256)
     },
     "kidney": {
-        "path": "Models/final_model_25.h5",
+        "path": "Models/final_model_25.keras",
         "model": None,
         "classes": ["Non-Stone", "Stone"],
         "img_size": (300, 300)
     },
     "bone": {
-        "path": "Models/bone_2_fracture_model.h5",
+        "path": "Models/bone_2_fracture_model.keras",
         "model": None,
         "classes": ["Fractured", "Not Fractured"],
         "img_size": (300, 300)
     },
     "brainStroke": {
-        "path": "Models/Brain_Stroke.h5",
+        "path": "Models/Brain_Stroke.keras",
         "model": None,
         "classes": ["Bleeding", "Ischemia", "Normal "],
         "img_size": (300, 300)
@@ -86,28 +86,29 @@ def get_model(model_name):
     model_data = MODELS[model_name]
     model_path = model_data["path"]
 
-    # Download if not exists
     if not os.path.exists(model_path):
         print(f"⬇️ Downloading {model_name} model...")
         url = MODEL_URLS[model_name]
         gdown.download(url, model_path, quiet=False)
 
-    # Use cached model
     if CURRENT_MODEL["name"] == model_name:
         print(f"⚡ Using cached model: {model_name}")
         return CURRENT_MODEL["model"]
 
-    # Remove previous model from RAM
     if CURRENT_MODEL["model"] is not None:
         print(f"🧹 Clearing RAM model: {CURRENT_MODEL['name']}")
         del CURRENT_MODEL["model"]
         gc.collect()
 
-    # Load model
     print(f"📦 Loading model into RAM: {model_name}")
-    
-    model = tf.keras.models.load_model(model_path, compile=False , custom_objects={}, safe_mode=True)
- 
+
+    # 🔥 FIX HERE (critical change)
+    with keras.utils.custom_object_scope({}):
+        model = tf.keras.models.load_model(
+            model_path,
+            compile=False,
+            safe_mode=False
+        )
 
     CURRENT_MODEL["name"] = model_name
     CURRENT_MODEL["model"] = model
