@@ -101,7 +101,7 @@ def get_model(model_name):
 
     # Load model
     print(f"📦 Loading model into RAM: {model_name}")
-    model = tf.keras.models.load_model(model_path, compile=False , safe_mode=False)
+    model = tf.keras.models.load_model(model_path, compile=False )
 
     CURRENT_MODEL["name"] = model_name
     CURRENT_MODEL["model"] = model
