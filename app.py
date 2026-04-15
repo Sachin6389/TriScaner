@@ -103,7 +103,7 @@ def get_model(model_name):
     # Load model
     print(f"📦 Loading model into RAM: {model_name}")
     
-    model = load_model(model_path, compile=False)
+    model = load_model(model_path, compile=False , custom_objects={}, safe_mode=True)
  
 
     CURRENT_MODEL["name"] = model_name
