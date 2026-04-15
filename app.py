@@ -13,7 +13,7 @@ import uuid
 
 from utils.Xrayprocessing import preprocess_image
 from utils.Pridicted import predict_model
-from keras.models import load_model
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -103,7 +103,7 @@ def get_model(model_name):
     # Load model
     print(f"📦 Loading model into RAM: {model_name}")
     
-    model = load_model(model_path, compile=False , custom_objects={}, safe_mode=True)
+    model = tf.keras.models.load_model(model_path, compile=False , custom_objects={}, safe_mode=True)
  
 
     CURRENT_MODEL["name"] = model_name
