@@ -1,7 +1,7 @@
 
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-os.environ["TF_USE_LEGACY_KERAS"] = "1"
+
 
 import tensorflow as tf
 import gdown
@@ -108,7 +108,8 @@ def get_model(model_name):
     # ✔ safe load (production recommended)
     model = tf.keras.models.load_model(
         model_path,
-        compile=False
+        compile=False,
+        safe_mode=True
     )
 
     MODEL_CACHE[model_name] = model
