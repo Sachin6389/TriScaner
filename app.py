@@ -16,10 +16,10 @@ import uuid
 from utils.Xrayprocessing import preprocess_image
 from utils.Pridicted import predict_model
 
-import keras
+
 
 print("TensorFlow version:", tf.__version__)
-print("Keras version:", keras.__version__)
+
 
 
 # ================= LOGGING =================
