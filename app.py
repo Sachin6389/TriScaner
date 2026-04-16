@@ -1,6 +1,7 @@
 
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
 
 import tensorflow as tf
 import gdown
@@ -14,6 +15,11 @@ import uuid
 
 from utils.Xrayprocessing import preprocess_image
 from utils.Pridicted import predict_model
+
+import keras
+
+print("TensorFlow version:", tf.__version__)
+print("Keras version:", keras.__version__)
 
 
 # ================= LOGGING =================
