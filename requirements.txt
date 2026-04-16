@@ -1,9 +1,9 @@
+Flask==3.0.3
+flask-cors==4.0.1
 tensorflow==2.16.1
 keras==3.3.3
-flask
-flask-cors
-numpy
-pillow
-gunicorn
-gdown
-h5py==3.11.0
+numpy==1.26.4
+pillow==10.4.0
+gdown==5.2.0
+werkzeug==3.0.3
+gunicorn==22.0.0

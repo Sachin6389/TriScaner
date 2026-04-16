@@ -1,3 +1,4 @@
+
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
@@ -5,7 +6,6 @@ import tensorflow as tf
 import gdown
 import gc
 import logging
-import keras
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -16,6 +16,7 @@ from utils.Xrayprocessing import preprocess_image
 from utils.Pridicted import predict_model
 
 
+# ================= LOGGING =================
 logging.basicConfig(level=logging.INFO)
 
 # ================= CONFIG =================
@@ -23,14 +24,13 @@ UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
-
-
-# ================= INIT =================
+# ================= INIT APP =================
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 print("🚀 Starting Medical AI API...")
+
+# ================= MODEL DOWNLOAD LINKS =================
 MODEL_URLS = {
     "brain": "https://drive.google.com/uc?id=1ELkXBBUTFc5z19O5Or73Ji8Fazrt3Upc",
     "chest": "https://drive.google.com/uc?id=11Oxcx2Ta2YMVKSWxeyD4GaXpc8Q683CL",
@@ -38,42 +38,45 @@ MODEL_URLS = {
     "bone": "https://drive.google.com/uc?id=1psqt1_MQxb7QYBXZX3EroPvGjV-jDnXP",
     "brainStroke": "https://drive.google.com/uc?id=1spKUf6tzPRS9Pr-64KSt1cCv4-lrD-lh"
 }
-print("📦 Loading models...")
 
+print("📦 Model registry loaded...")
+
+# ================= MODEL CONFIG =================
 MODELS = {
     "brain": {
         "path": "Models/mri_brain_model_final.keras",
-        "model": None,
-        "classes": ["Alzehaimer", "Glioma-Tumor", "Meningioma-Tumor", "Multiple Sclerosis", "Normal", "Pituitary-Tumor"],
+        "classes": ["Alzehaimer", "Glioma-Tumor", "Meningioma-Tumor",
+                    "Multiple Sclerosis", "Normal", "Pituitary-Tumor"],
         "img_size": (300, 300)
     },
     "chest": {
         "path": "Models/chest_ct_cancer_model.keras",
-        "model": None,
-        "classes": ["adenocarcinoma_left.lower.lobe_T2_N0_M0_Ib ", "normal", "squamous.cell.carcinoma_left.hilum_T1_N2_M0_IIIa "],
+        "classes": [
+            "adenocarcinoma_left.lower.lobe_T2_N0_M0_Ib",
+            "normal",
+            "squamous.cell.carcinoma_left.hilum_T1_N2_M0_IIIa"
+        ],
         "img_size": (256, 256)
     },
     "kidney": {
         "path": "Models/final_model_25.keras",
-        "model": None,
         "classes": ["Non-Stone", "Stone"],
         "img_size": (300, 300)
     },
     "bone": {
         "path": "Models/bone_2_fracture_model.keras",
-        "model": None,
         "classes": ["Fractured", "Not Fractured"],
         "img_size": (300, 300)
     },
     "brainStroke": {
         "path": "Models/Brain_Stroke.keras",
-        "model": None,
-        "classes": ["Bleeding", "Ischemia", "Normal "],
+        "classes": ["Bleeding", "Ischemia", "Normal"],
         "img_size": (300, 300)
     }
 }
 
-CURRENT_MODEL = {"name": None, "model": None}
+# ================= MODEL CACHE =================
+MODEL_CACHE = {}
 
 # ================= HELPERS =================
 def allowed_file(filename):
@@ -82,41 +85,28 @@ def allowed_file(filename):
 
 def get_model(model_name):
     os.makedirs("Models", exist_ok=True)
-    global CURRENT_MODEL
 
-    model_data = MODELS[model_name]
-    model_path = model_data["path"]
+    # ✔ return cached model
+    if model_name in MODEL_CACHE:
+        return MODEL_CACHE[model_name]
 
+    model_path = MODELS[model_name]["path"]
+
+    # ✔ download if missing
     if not os.path.exists(model_path):
         print(f"⬇️ Downloading {model_name} model...")
-        url = MODEL_URLS[model_name]
-        gdown.download(url, model_path, quiet=False)
-
-    if CURRENT_MODEL["name"] == model_name:
-        return CURRENT_MODEL["model"]
-
-    if CURRENT_MODEL["model"] is not None:
-        del CURRENT_MODEL["model"]
-        gc.collect()
+        gdown.download(MODEL_URLS[model_name], model_path, quiet=False)
 
     print(f"📦 Loading model: {model_name}")
 
-    # 🔥 HARD FIX (bypass broken config)
+    # ✔ safe load (production recommended)
     model = tf.keras.models.load_model(
         model_path,
-        compile=False,
-        safe_mode=False,
-        custom_objects={
-            "Dense": tf.keras.layers.Dense
-        }
+        compile=False
     )
 
-    CURRENT_MODEL["name"] = model_name
-    CURRENT_MODEL["model"] = model
-
+    MODEL_CACHE[model_name] = model
     return model
-
-
 
 # ================= MEDICAL INFO =================
 MEDICAL_INFO = {
@@ -484,12 +474,6 @@ def predict(model_name):
     if model_name not in MODELS:
         return jsonify({"error": "Invalid model name"}), 400
 
-    model = get_model(model_name)
-    model_data = MODELS[model_name]
-    
-
-    
-
     if "image" not in request.files:
         return jsonify({"error": "No image uploaded"}), 400
 
@@ -506,6 +490,9 @@ def predict(model_name):
 
     try:
         file.save(file_path)
+
+        model = get_model(model_name)
+        model_data = MODELS[model_name]
 
         img = preprocess_image(file_path, model_data["img_size"])
 
@@ -551,8 +538,8 @@ def health():
     return jsonify({
         "status": "ok",
         "models_loaded": {
-            name: model["model"] is not None
-            for name, model in MODELS.items()
+            name: (name in MODEL_CACHE)
+            for name in MODELS.keys()
         }
     })
 
